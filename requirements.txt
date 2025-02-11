@@ -1,0 +1,8 @@
+pydantic~=2.10.6
+pydantic-settings
+motor~=3.6.1
+fastapi~=0.115.7
+uvicorn
+asyncpg
+starlette~=0.45.3
+SQLAlchemy~=2.0.37
