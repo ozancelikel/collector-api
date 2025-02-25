@@ -4,7 +4,7 @@ from app.config import settings
 
 # Create the async engine
 # Make echo=True for logging async_engine!
-engine = create_async_engine(settings.DB_URL, echo=settings.DB_DEBUG)
+engine = create_async_engine(settings.DATABASE_URL, echo=settings.DB_DEBUG)
 
 # Create session maker using AsyncSession
 AsyncSessionLocal = sessionmaker(

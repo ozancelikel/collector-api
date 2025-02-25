@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -6,32 +7,32 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
 from app.readings.router import router as barani_router
-
-logging.basicConfig(
-    filename="server.log",  # Shared log file
-    level=logging.INFO,  # Default level (services can override)
-    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
-logger = logging.getLogger(__name__)
+from app.campbell.router import router as campbell_router
+from app.tasks.scheduler import start_scheduler, shutdown_scheduler
+from app.logs.config_server_logs import server_logger
 
 
 class LogRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         body = await request.body()
-        logger.info(f"Incoming request body: {body.decode()}")
+        server_logger.info(f"Incoming request body: {body.decode()}")
 
         response = await call_next(request)
         return response
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler to start the scheduler."""
+    start_scheduler()
+    yield  # Keep FastAPI running
+    shutdown_scheduler()
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(LogRequestMiddleware)
 
 app.include_router(barani_router, prefix="/messages")
-
+app.include_router(campbell_router)
 
 @app.get("/")
 def health_check():
@@ -41,7 +42,7 @@ def health_check():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     error_details = exc.errors()
-    logger.error(f"Validation error on {request.url}: {error_details}")
+    server_logger.error(f"Validation error on {request.url}: {error_details}")
 
     return JSONResponse(
         status_code=422,

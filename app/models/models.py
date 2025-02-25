@@ -37,3 +37,19 @@ class BaraniWindSensors(Base):
     wind_stdev10 = Column(Float)
     created_at = Column(DateTime)
 
+class CampbellSensors(Base):
+    __tablename__ = 'campbell_sensors'
+
+    timestamp = Column(DateTime, primary_key=True)
+    air_temp_avg = Column(Float)
+    batt_voltage_avg = Column(Float)
+    bp_mbar_avg = Column(Float)
+    dew_point_avg = Column(Float)
+    met_sens_status = Column(String)
+    ms60_irradiance_avg = Column(Float)
+    p_temp_avg = Column(Float)
+    rain_mm_tot = Column(Float)
+    humidity = Column(Float)
+    wind_dir = Column(Float)
+    wind_speed = Column(Float)
+    created_at = Column(DateTime)
