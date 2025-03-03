@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.models import BaraniHelixSensors, BaraniWindSensors
-from app.readings.schemas import HelixMessage, WindMessage
+from app.barani.schemas import HelixMessage, WindMessage
 
 
 async def get_sensor_by_serial_number(db: AsyncSession, serial_number: str):
@@ -55,14 +55,19 @@ async def insert_barani_wind_reading(db: AsyncSession, wind_reading: WindMessage
         timestamp=timestamp,
         serial_number=wind_reading.serial_number,
         battery=wind_reading.battery,
+
         wdir_avg10=wind_reading.wdir_avg10,
         wdir_max10=wind_reading.wdir_max10,
         wdir_min10=wind_reading.wdir_min10,
+
         wind_avg10=wind_reading.wind_avg10,
         wind_max10=wind_reading.wind_max10,
-        wind_gust10=wind_reading.wind_gust10,
+        wind_min10=wind_reading.wind_min10,
+
+        wdir_gust10=wind_reading.wdir_gust10,
         wdir_stdev10=wind_reading.wdir_stdev10,
         wind_stdev10=wind_reading.wind_stdev10,
+
         created_at=datetime.utcnow(),
     )
 

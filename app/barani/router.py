@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.logs.config_server_logs import server_logger
-from app.readings.schemas import HelixMessage, WindMessage
-import app.readings.service as reading_service
+from app.barani.schemas import HelixMessage, WindMessage
+import app.barani.service as reading_service
 from app.db.session import get_db
 
 router = APIRouter()

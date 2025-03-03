@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime
+from sqlalchemy import Column, String, Float, DateTime, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -27,15 +27,25 @@ class BaraniWindSensors(Base):
     serial_number = Column(String, primary_key=True)
     timestamp = Column(DateTime, primary_key=True)
     battery = Column(Float)
+
     wdir_avg10 = Column(Float)
     wdir_max10 = Column(Float)
     wdir_min10 = Column(Float)
+
     wind_avg10 = Column(Float)
     wind_max10 = Column(Float)
-    wind_gust10 = Column(Float)
+    wind_min10 = Column(Float)
+
+    wdir_gust10 = Column(Float)
     wdir_stdev10 = Column(Float)
     wind_stdev10 = Column(Float)
+
     created_at = Column(DateTime)
+
+    # composite primary key
+    __table_args__ = (
+        PrimaryKeyConstraint('serial_number', 'timestamp'),
+    )
 
 class CampbellSensors(Base):
     __tablename__ = 'campbell_sensors'

@@ -2,9 +2,7 @@ import csv
 import traceback
 from datetime import datetime
 
-from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from openpyxl import load_workbook
 
 from app.campbell.schemas import CampbellMessage
@@ -14,7 +12,6 @@ from app.campbell.scraper_scripts.download_file import click_download_button, mo
 from app.config import settings
 from app.entities.file_type import FileType
 from app.logs.config_scraper_logs import scraper_logger
-from app.db.session import get_db
 from app.models.models import CampbellSensors
 from app.logs.config_server_logs import server_logger
 from app.db.session import AsyncSessionLocal
@@ -71,7 +68,7 @@ async def run_campbell_scraper(hourly: bool=True):
         driver.quit()
         scraper_logger.info("🔒 Fermeture du navigateur.")
 
-async def process_campbell_file(file: str, file_type: FileType, db: AsyncSession = Depends(get_db)):
+async def process_campbell_file(file: str, file_type: FileType):
     try:
         async with AsyncSessionLocal() as db:
             if file_type == FileType.XLSX:

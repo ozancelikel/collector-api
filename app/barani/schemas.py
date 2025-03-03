@@ -6,6 +6,7 @@ from typing import Optional, Union
 class HelixMessage(BaseModel):
     timestamp: Union[str, datetime] = Field(..., alias="time", example="1738143000000")
     serial_number: str = Field(..., alias="sn", example="2110XX001")
+
     rain: Optional[float] = Field(..., alias="Rain", example=None)
     battery: Optional[float] = Field(..., alias="Battery", example=None)
     dew_point: Optional[float] = Field(..., alias="DewPoint", example=None)
@@ -29,14 +30,18 @@ class WindMessage(BaseModel):
     timestamp: Union[str, datetime] = Field(..., alias="time", example="1738143000000")
     serial_number: str = Field(..., alias="sn", example="2110XX001")
     battery: Optional[float] = Field(..., alias="Battery", example=None)
+
     wdir_avg10: Optional[float] = Field(..., alias="Wdir_Avg10", example=None)
     wdir_max10: Optional[float] = Field(..., alias="Wdir_Max10", example=None)
     wdir_min10: Optional[float] = Field(..., alias="Wdir_Min10", example=None)
+
     wind_avg10: Optional[float] = Field(..., alias="Wind_Avg10", example=None)
     wind_max10: Optional[float] = Field(..., alias="Wind_Max10", example=None)
-    wind_gust10: Optional[float] = Field(..., alias="Wind_Min10", example=None)
-    wdir_stdev10: Optional[float] = Field(..., alias="Wdir_Gust10", example=None)
-    wind_stdev10: Optional[float] = Field(..., alias="Wdir_Stdev10", example=None)
+    wind_min10: Optional[float] = Field(..., alias="Wind_Min10", example=None)
+
+    wdir_gust10: Optional[float] = Field(..., alias="Wdir_Gust10", example=None)
+    wdir_stdev10: Optional[float] = Field(..., alias="Wdir_Stdev10", example=None)
+    wind_stdev10: Optional[float] = Field(..., alias="Wind_Stdev10", example=None)
 
 
 """

@@ -6,7 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-from app.readings.router import router as barani_router
+from app.barani.router import router as barani_router
 from app.campbell.router import router as campbell_router
 from app.tasks.scheduler import start_scheduler, shutdown_scheduler
 from app.logs.config_server_logs import server_logger
