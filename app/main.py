@@ -8,6 +8,7 @@ from starlette.responses import JSONResponse
 
 from app.barani.router import router as barani_router
 from app.campbell.router import router as campbell_router
+from app.davis.router import router as davis_router
 from app.tasks.scheduler import start_scheduler, shutdown_scheduler
 from app.logs.config_server_logs import server_logger
 
@@ -33,6 +34,7 @@ app.add_middleware(LogRequestMiddleware)
 
 app.include_router(barani_router, prefix="/messages")
 app.include_router(campbell_router)
+app.include_router(davis_router, prefix="/davis")
 
 @app.get("/")
 def health_check():
@@ -42,6 +44,7 @@ def health_check():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     error_details = exc.errors()
+    server_logger.error("YO DAT MIDDLEWARE SHIT BRUH!")
     server_logger.error(f"Validation error on {request.url}: {error_details}")
 
     return JSONResponse(

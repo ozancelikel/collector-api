@@ -21,6 +21,11 @@ async def create_barani_helix_reading(db: AsyncSession, sensor_reading: HelixMes
     else:
         timestamp = datetime.fromisoformat(timestamp).replace(
             tzinfo=None)
+    # Pour changemenet de Pa a hPa
+    if sensor_reading.pressure > 10000 :
+        pressure = float(sensor_reading.pressure / 100)
+    else:
+        pressure = sensor_reading.pressure
 
     new_reading = BaraniHelixSensors(
         timestamp=timestamp,
@@ -29,7 +34,7 @@ async def create_barani_helix_reading(db: AsyncSession, sensor_reading: HelixMes
         battery=sensor_reading.battery,
         dew_point=sensor_reading.dew_point,
         humidity=sensor_reading.humidity,
-        pressure=sensor_reading.pressure,
+        pressure=pressure,
         irradiation=sensor_reading.irradiation,
         temperature=sensor_reading.temperature,
         rainfall_rate_max=sensor_reading.rainfall_rate_max,

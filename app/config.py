@@ -13,7 +13,12 @@ class Settings(BaseSettings):
     KONECTGDS_USERNAME: str
     KONECTGDS_PASSWORD: str
     KONECTGDS_URL: str
-
+    DAVIS_INTERNAL_API_KEY: str
+    DAVIS_EXTERNAL_API_URI: str
+    DAVIS_EXTERNAL_API_SECRET: str
+    DAVIS_EXTERNAL_API_KEY: str
+    DAVIS_STATION_ID: str
+    DAVIS_TRIGGER_FREQ: int
 
     class Config:
         env_file = ".env"
