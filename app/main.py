@@ -44,7 +44,6 @@ def health_check():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     error_details = exc.errors()
-    server_logger.error("YO DAT MIDDLEWARE SHIT BRUH!")
     server_logger.error(f"Validation error on {request.url}: {error_details}")
 
     return JSONResponse(
