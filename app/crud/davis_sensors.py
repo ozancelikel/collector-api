@@ -16,6 +16,8 @@ async def create_davis_sensors(db: AsyncSession, message: DavisMessage) -> Optio
     gateway_id = uuid.uuid4()
     vantage_id = uuid.uuid4()
 
+    gateway_existing = await get_existing_gateway(db, message)
+
     if await check_existing_ts(db, message):
         new_vantagePro = DavisVantagePro2(
             id=vantage_id,
@@ -65,67 +67,70 @@ async def create_davis_sensors(db: AsyncSession, message: DavisMessage) -> Optio
             wind_speed_10_min=message.vantagePro_msg.wind_speed_10_min,
             wet_bulb=message.vantagePro_msg.wet_bulb
         )
-
-        new_gateway = DavisGatewayQuectel(
-            id=gateway_id,
-            lsid=message.gateway_msg.lsid,
-            ts=message.gateway_msg.ts,
-            tz_offset=message.gateway_msg.tz_offset,
-            date=datetime.fromtimestamp(message.gateway_msg.ts),
-            sensor_data_structure_id=f"{message.gateway_msg.sensor_type}_{message.gateway_msg.data_structure_type}",
-            iss_solar_panel_voltage=message.gateway_msg.iss_solar_panel_voltage,
-            last_gps_reading_timestamp=message.gateway_msg.last_gps_reading_timestamp,
-            resyncs=message.gateway_msg.resyncs,
-            transmitter_battery_state=message.gateway_msg.transmitter_battery_state,
-            crc_errors=message.gateway_msg.crc_errors,
-            tiva_application_firmware_version=message.gateway_msg.tiva_application_firmware_version,
-            lead_acid_battery_voltage=message.gateway_msg.lead_acid_battery_voltage,
-            iss_transmitter_battery_voltage=message.gateway_msg.iss_transmitter_battery_voltage,
-            beacon_interval=message.gateway_msg.beacon_interval,
-            davistalk_rssi=message.gateway_msg.davistalk_rssi,
-            solar_panel_voltage=message.gateway_msg.solar_panel_voltage,
-            rank=message.gateway_msg.rank,
-            false_wakeup_rssi=message.gateway_msg.false_wakeup_rssi,
-            cell_id=message.gateway_msg.cell_id,
-            longitude=message.gateway_msg.longitude,
-            power_percentage_mcu=message.gateway_msg.power_percentage_mcu,
-            mcc_mnc=message.gateway_msg.mcc_mnc,
-            iss_super_cap_voltage=message.gateway_msg.iss_super_cap_voltage,
-            false_wakeup_count=message.gateway_msg.false_wakeup_count,
-            etx=message.gateway_msg.etx,
-            number_of_neighbors=message.gateway_msg.number_of_neighbors,
-            last_parent_rtt_ping=message.gateway_msg.last_parent_rtt_ping,
-            bootloader_version=message.gateway_msg.bootloader_version,
-            cme=message.gateway_msg.cme,
-            cc1310_firmware_version=message.gateway_msg.cc1310_firmware_version,
-            power_percentage_rx=message.gateway_msg.power_percentage_rx,
-            good_packet_streak=message.gateway_msg.good_packet_streak,
-            rpl_parent_node_id=message.gateway_msg.rpl_parent_node_id,
-            afc_setting=message.gateway_msg.afc_setting,
-            overall_access_technology=message.gateway_msg.overall_access_technology,
-            cell_channel=message.gateway_msg.cell_channel,
-            noise_floor_rssi=message.gateway_msg.noise_floor_rssi,
-            latitude=message.gateway_msg.latitude,
-            cereg=message.gateway_msg.cereg,
-            last_cme_error_timestamp=message.gateway_msg.last_cme_error_timestamp,
-            bluetooth_firmware_version=message.gateway_msg.bluetooth_firmware_version,
-            location_area_code=message.gateway_msg.location_area_code,
-            link_layer_packets_received=message.gateway_msg.link_layer_packets_received,
-            reception_percent=message.gateway_msg.reception_percent,
-            rx_bytes=message.gateway_msg.rx_bytes,
-            link_uptime=message.gateway_msg.link_uptime,
-            creg_cgreg=message.gateway_msg.creg_cgreg,
-            health_version=message.gateway_msg.health_version,
-            inside_box_temp=message.gateway_msg.inside_box_temp,
-            tx_bytes=message.gateway_msg.tx_bytes,
-            elevation=message.gateway_msg.elevation,
-            power_percentage_tx=message.gateway_msg.power_percentage_tx,
-            rssi=message.gateway_msg.rssi,
-            last_rx_rssi=message.gateway_msg.last_rx_rssi,
-            rpl_mode=message.gateway_msg.rpl_mode,
-            uptime=message.gateway_msg.uptime,
-            platform_id=message.gateway_msg.platform_id
-        )
+        if gateway_existing:
+            gateway_id = gateway_existing.id
+        else:
+            new_gateway = DavisGatewayQuectel(
+                id=gateway_id,
+                lsid=message.gateway_msg.lsid,
+                ts=message.gateway_msg.ts,
+                tz_offset=message.gateway_msg.tz_offset,
+                date=datetime.fromtimestamp(message.gateway_msg.ts),
+                sensor_data_structure_id=f"{message.gateway_msg.sensor_type}_{message.gateway_msg.data_structure_type}",
+                iss_solar_panel_voltage=message.gateway_msg.iss_solar_panel_voltage,
+                last_gps_reading_timestamp=message.gateway_msg.last_gps_reading_timestamp,
+                resyncs=message.gateway_msg.resyncs,
+                transmitter_battery_state=message.gateway_msg.transmitter_battery_state,
+                crc_errors=message.gateway_msg.crc_errors,
+                tiva_application_firmware_version=message.gateway_msg.tiva_application_firmware_version,
+                lead_acid_battery_voltage=message.gateway_msg.lead_acid_battery_voltage,
+                iss_transmitter_battery_voltage=message.gateway_msg.iss_transmitter_battery_voltage,
+                beacon_interval=message.gateway_msg.beacon_interval,
+                davistalk_rssi=message.gateway_msg.davistalk_rssi,
+                solar_panel_voltage=message.gateway_msg.solar_panel_voltage,
+                rank=message.gateway_msg.rank,
+                false_wakeup_rssi=message.gateway_msg.false_wakeup_rssi,
+                cell_id=message.gateway_msg.cell_id,
+                longitude=message.gateway_msg.longitude,
+                power_percentage_mcu=message.gateway_msg.power_percentage_mcu,
+                mcc_mnc=message.gateway_msg.mcc_mnc,
+                iss_super_cap_voltage=message.gateway_msg.iss_super_cap_voltage,
+                false_wakeup_count=message.gateway_msg.false_wakeup_count,
+                etx=message.gateway_msg.etx,
+                number_of_neighbors=message.gateway_msg.number_of_neighbors,
+                last_parent_rtt_ping=message.gateway_msg.last_parent_rtt_ping,
+                bootloader_version=message.gateway_msg.bootloader_version,
+                cme=message.gateway_msg.cme,
+                cc1310_firmware_version=message.gateway_msg.cc1310_firmware_version,
+                power_percentage_rx=message.gateway_msg.power_percentage_rx,
+                good_packet_streak=message.gateway_msg.good_packet_streak,
+                rpl_parent_node_id=message.gateway_msg.rpl_parent_node_id,
+                afc_setting=message.gateway_msg.afc_setting,
+                overall_access_technology=message.gateway_msg.overall_access_technology,
+                cell_channel=message.gateway_msg.cell_channel,
+                noise_floor_rssi=message.gateway_msg.noise_floor_rssi,
+                latitude=message.gateway_msg.latitude,
+                cereg=message.gateway_msg.cereg,
+                last_cme_error_timestamp=message.gateway_msg.last_cme_error_timestamp,
+                bluetooth_firmware_version=message.gateway_msg.bluetooth_firmware_version,
+                location_area_code=message.gateway_msg.location_area_code,
+                link_layer_packets_received=message.gateway_msg.link_layer_packets_received,
+                reception_percent=message.gateway_msg.reception_percent,
+                rx_bytes=message.gateway_msg.rx_bytes,
+                link_uptime=message.gateway_msg.link_uptime,
+                creg_cgreg=message.gateway_msg.creg_cgreg,
+                health_version=message.gateway_msg.health_version,
+                inside_box_temp=message.gateway_msg.inside_box_temp,
+                tx_bytes=message.gateway_msg.tx_bytes,
+                elevation=message.gateway_msg.elevation,
+                power_percentage_tx=message.gateway_msg.power_percentage_tx,
+                rssi=message.gateway_msg.rssi,
+                last_rx_rssi=message.gateway_msg.last_rx_rssi,
+                rpl_mode=message.gateway_msg.rpl_mode,
+                uptime=message.gateway_msg.uptime,
+                platform_id=message.gateway_msg.platform_id
+            )
+            db.add(new_gateway)
 
         new_barometer = DavisBarometer(
             id=barometer_id,
@@ -148,12 +153,12 @@ async def create_davis_sensors(db: AsyncSession, message: DavisMessage) -> Optio
         )
 
         db.add(new_vantagePro)
-        db.add(new_gateway)
         db.add(new_barometer)
         try:
             await db.commit()
             await db.refresh(new_vantagePro)
-            await db.refresh(new_gateway)
+            if not gateway_existing:
+                await db.refresh(new_gateway)
             await db.refresh(new_barometer)
         except Exception as e:
             logger.error(e)
@@ -182,3 +187,13 @@ async def check_existing_ts(db: AsyncSession, message: DavisMessage):
         return False
     else:
         return True
+
+async def get_existing_gateway(db: AsyncSession, message: DavisMessage) -> Optional[DavisGatewayQuectel]:
+    result = await db.execute(select(DavisGatewayQuectel).filter(DavisGatewayQuectel.ts == message.gateway_msg.ts))
+    existing_entry = result.scalars().first()
+
+    if existing_entry:
+        logger.info(f"Gateway exists, using existing Gateway entry with id: {existing_entry.id}")
+        return existing_entry
+    else:
+        return None

@@ -1,5 +1,8 @@
-from typing import List, Optional
-from pydantic import BaseModel
+from typing import Optional
+
+from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel, Field, model_validator
+from typing_extensions import Self
 
 
 class VantageProV2Message(BaseModel):
@@ -128,3 +131,15 @@ class DavisMessage(BaseModel):
     barometer_msg: BarometerMessage
     gateway_msg: GatewayQuectelHealthMessage
     vantagePro_msg: VantageProV2Message
+
+
+class HistoricMessage(BaseModel):
+    start_time: int = Field(..., description="Unix timestamp (seconds)")
+    end_time: int = Field(..., description="Unix timestamp (seconds)")
+
+    @model_validator(mode='after')
+    def check_time_diff(self) -> Self:
+        if self.start_time is not None and (self.end_time - self.start_time) > 86400:
+            raise RequestValidationError("Timestamps cannot be more than 24 hours apart.")
+        return self
+

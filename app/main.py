@@ -45,10 +45,10 @@ def health_check():
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     error_details = exc.errors()
     server_logger.error(f"Validation error on {request.url}: {error_details}")
-
     return JSONResponse(
         status_code=422,
         content={
+            "status": 422,
             "error": "Validation Failed",
             "details": error_details
         },

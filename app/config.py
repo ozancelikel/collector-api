@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     DAVIS_EXTERNAL_API_KEY: str
     DAVIS_STATION_ID: str
     DAVIS_TRIGGER_FREQ: int
+    DAVIS_HISTORIC_API_URI: str
+    DAVIS_IS_HISTORIC: bool = Field(default=False)
 
     class Config:
         env_file = ".env"
