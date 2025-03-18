@@ -92,7 +92,7 @@ class DavisVantagePro2(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True)
     lsid = Column(Integer)
-    ts = Column(BigInteger)
+    ts = Column(BigInteger, unique=True)
     tz_offset = Column(Integer)
     date = Column(DateTime)
     sensor_data_structure_id = Column(String, ForeignKey('davis_sensor_data_structure.id'))
@@ -145,7 +145,7 @@ class DavisGatewayQuectel(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True)
     lsid = Column(Integer)
-    ts = Column(BigInteger)
+    ts = Column(BigInteger, unique=True)
     tz_offset = Column(Integer)
     date = Column(DateTime)
     sensor_data_structure_id = Column(String, ForeignKey('davis_sensor_data_structure.id'))
@@ -210,7 +210,7 @@ class DavisBarometer(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True)
     lsid = Column(Integer)
-    ts = Column(BigInteger)
+    ts = Column(BigInteger, unique=True)
     tz_offset = Column(Integer)
     date = Column(DateTime)
     sensor_data_structure_id = Column(String, ForeignKey('davis_sensor_data_structure.id'))

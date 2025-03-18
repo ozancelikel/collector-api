@@ -17,8 +17,8 @@ async def create_davis_sensors(db: AsyncSession, message: DavisMessage) -> Optio
     vantage_id = uuid.uuid4()
 
     gateway_existing = await get_existing_gateway(db, message)
-
-    if await check_existing_ts(db, message):
+    ts_check = await check_existing_ts(db, message)
+    if ts_check:
         new_vantagePro = DavisVantagePro2(
             id=vantage_id,
             lsid=message.vantagePro_msg.lsid,
@@ -179,10 +179,12 @@ async def create_davis_sensors(db: AsyncSession, message: DavisMessage) -> Optio
 
 
 async def check_existing_ts(db: AsyncSession, message: DavisMessage):
-    result = await db.execute(select(DavisVantagePro2).filter(DavisVantagePro2.ts == message.vantagePro_msg.ts))
-    existing_entry = result.scalars().first()
+    result_vantage = await db.execute(select(DavisVantagePro2).filter(DavisVantagePro2.ts == message.vantagePro_msg.ts))
+    result_baro = await db.execute(select(DavisBarometer).filter(DavisBarometer.ts == message.barometer_msg.ts))
+    existing_vantage = result_vantage.scalars().first()
+    existing_baro = result_baro.scalars().first()
 
-    if existing_entry:
+    if existing_vantage or existing_baro:
         print("Record with the same timestamp already exists. Skipping insertion.")
         return False
     else:
