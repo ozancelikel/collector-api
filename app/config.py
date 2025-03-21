@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     SCRAPER_DOWNLOAD_FILE_TYPE: str
     SCRAPER_FREQ: int
     SCRAPER_HOURLY: bool = Field(default=False)
+    SCRAPER_STATION: str
     KONECTGDS_USERNAME: str
     KONECTGDS_PASSWORD: str
     KONECTGDS_URL: str

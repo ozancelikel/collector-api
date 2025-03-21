@@ -1,6 +1,7 @@
 import csv
 import traceback
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy.exc import IntegrityError
 from openpyxl import load_workbook
@@ -17,7 +18,7 @@ from app.logs.config_server_logs import server_logger
 from app.db.session import AsyncSessionLocal
 
 
-async def run_campbell_scraper(hourly: bool=True):
+async def run_campbell_scraper(hourly: bool=True, station_name: Optional[str]=None):
     """Programme principal qui gère la connexion et les tâches d'automatisation."""
     driver = init_driver(visibility=False)
 
@@ -68,7 +69,14 @@ async def run_campbell_scraper(hourly: bool=True):
         driver.quit()
         scraper_logger.info("🔒 Fermeture du navigateur.")
 
-async def process_campbell_file(file: str, file_type: FileType):
+async def process_campbell_file(file: str, file_type: FileType, station_name: Optional[str]=None):
+    if station_name is None:
+        station_id = settings.SCRAPER_STATION
+    elif station_name == settings.SCRAPER_STATION:
+        station_id = station_name
+    else:
+        raise Exception("Unsupported station name!")
+
     try:
         async with AsyncSessionLocal() as db:
             if file_type == FileType.XLSX:
@@ -102,6 +110,7 @@ async def process_campbell_file(file: str, file_type: FileType):
 
                     new_sensor = CampbellSensors(
                         timestamp=sensor_data.timestamp,
+                        station_name=station_id,
                         air_temp_avg=sensor_data.air_temp_avg,
                         batt_voltage_avg=sensor_data.batt_voltage_avg,
                         bp_mbar_avg=sensor_data.bp_mbar_avg,
@@ -156,6 +165,7 @@ async def process_campbell_file(file: str, file_type: FileType):
 
                         new_sensor = CampbellSensors(
                             timestamp=sensor_data.timestamp,
+                            station_name=station_id,
                             air_temp_avg=sensor_data.air_temp_avg,
                             batt_voltage_avg=sensor_data.batt_voltage_avg,
                             bp_mbar_avg=sensor_data.bp_mbar_avg,

@@ -53,9 +53,10 @@ class BaraniWindSensors(Base):
     )
 
 class CampbellSensors(Base):
-    __tablename__ = 'campbell_sensors'
+    __tablename__ = 'campbell_capu_di_muru'
 
     timestamp = Column(DateTime, primary_key=True)
+    station_name = Column(String, ForeignKey('campbell_station.name'))
     air_temp_avg = Column(Float)
     batt_voltage_avg = Column(Float)
     bp_mbar_avg = Column(Float)
@@ -68,6 +69,14 @@ class CampbellSensors(Base):
     wind_dir = Column(Float)
     wind_speed = Column(Float)
     created_at = Column(DateTime)
+
+
+class CampbellStation(Base):
+    __tablename__ = "campbell_station"
+
+    name = Column(String, primary_key=True, nullable=False)
+    location = Column(String, nullable=True)
+    created_at = Column(DateTime, nullable=False)
 
 class DavisStation(Base):
     __tablename__ = 'davis_station'
