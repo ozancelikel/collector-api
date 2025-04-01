@@ -3,7 +3,7 @@ from typing import Optional, Union
 import metpy.calc as mpcalc
 
 import httpx
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends
 from metpy.units import units
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,13 +13,9 @@ from app.db.session import get_db
 from app.logs.config_server_logs import server_logger
 from app.davis.schemas import DavisMessage, BarometerMessage, GatewayQuectelHealthMessage, VantageProV2Message, \
     HistoricMessage
+from app.authentication import api_token
 
 router = APIRouter()
-
-def api_key_dependency(x_api_key: str = Header(...)):
-    if x_api_key != settings.DAVIS_INTERNAL_API_KEY:
-        raise HTTPException(status_code=401, detail="Unauthorized access.")
-    return x_api_key
 
 
 def rebuild_message(vantagepro2: dict, gateway: dict, baro: dict, msg: dict) -> dict:
@@ -50,8 +46,8 @@ def rebuild_message(vantagepro2: dict, gateway: dict, baro: dict, msg: dict) -> 
     }
 
 
-@router.post("/receive_historic/")
-async def receive_historic(historic: HistoricMessage, api_key: str = Depends(api_key_dependency), db: AsyncSession = Depends(get_db)):
+@router.post("/receive_historic/", dependencies=[Depends(api_token)])
+async def receive_historic(historic: HistoricMessage, db: AsyncSession = Depends(get_db)):
     async with (httpx.AsyncClient() as client):
         external_api_uri = (f"https://{settings.DAVIS_HISTORIC_API_URI}{settings.DAVIS_STATION_ID}"
                             f"?station-id={settings.DAVIS_STATION_ID}&api-key={settings.DAVIS_EXTERNAL_API_KEY}"
@@ -100,8 +96,8 @@ async def receive_historic(historic: HistoricMessage, api_key: str = Depends(api
         return {"status": "success", "msg": "Uploaded docs with success."}
 
 
-@router.get("/receive_message/")
-async def receive_message(api_key: str = Depends(api_key_dependency), db: AsyncSession = Depends(get_db)):
+@router.get("/receive_message/", dependencies=[Depends(api_token)])
+async def receive_message(db: AsyncSession = Depends(get_db)):
     async with (httpx.AsyncClient() as client):
         external_api_uri = (f"https://{settings.DAVIS_EXTERNAL_API_URI}{settings.DAVIS_STATION_ID}"
                             f"?station-id={settings.DAVIS_STATION_ID}&api-key={settings.DAVIS_EXTERNAL_API_KEY}")

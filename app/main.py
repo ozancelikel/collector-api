@@ -9,14 +9,23 @@ from starlette.responses import JSONResponse
 from app.barani.router import router as barani_router
 from app.campbell.router import router as campbell_router
 from app.davis.router import router as davis_router
+from app.meteofrance.router import router as meteofrance_router
 from app.tasks.scheduler import start_scheduler, shutdown_scheduler
 from app.logs.config_server_logs import server_logger
 
 
 class LogRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # Read the body and store it in request.state
         body = await request.body()
-        server_logger.info(f"Incoming request body: {body.decode()}")
+
+        if body:
+            server_logger.info(f"Incoming request body: {body.decode(errors='ignore')}")
+        else:
+            server_logger.info("Incoming request with no body.")
+
+        # Store body in request.state for access in the route handler if necessary
+        request.state.body = body
 
         response = await call_next(request)
         return response
@@ -35,7 +44,7 @@ app.add_middleware(LogRequestMiddleware)
 app.include_router(barani_router, prefix="/messages")
 app.include_router(campbell_router)
 app.include_router(davis_router, prefix="/davis")
-
+app.include_router(meteofrance_router, prefix="/meteofrance")
 @app.get("/")
 def health_check():
     return {"status": "running"}

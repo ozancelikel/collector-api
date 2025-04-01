@@ -5,6 +5,7 @@ from pydantic import Field
 class Settings(BaseSettings):
     DATABASE_URL: str
     DB_DEBUG: bool = Field(default=False)
+    INTERNAL_API_KEY: str
     SCRAPER_DOWNLOAD_ABS_PATH: str
     SCRAPER_FILE_DEST: str
     SCRAPER_DOWNLOAD_FILE_TYPE: str
@@ -14,7 +15,6 @@ class Settings(BaseSettings):
     KONECTGDS_USERNAME: str
     KONECTGDS_PASSWORD: str
     KONECTGDS_URL: str
-    DAVIS_INTERNAL_API_KEY: str
     DAVIS_EXTERNAL_API_URI: str
     DAVIS_EXTERNAL_API_SECRET: str
     DAVIS_EXTERNAL_API_KEY: str
@@ -22,7 +22,10 @@ class Settings(BaseSettings):
     DAVIS_TRIGGER_FREQ: int
     DAVIS_HISTORIC_API_URI: str
     DAVIS_IS_HISTORIC: bool = Field(default=False)
-
+    METEOFRANCE_API_KEY: str
+    METEOFRANCE_URL: str
+    METEOFRANCE_OBS_INFRAHORAIRE: str
+    METEOFRANCE_OPTJSON: str
     class Config:
         env_file = ".env"
 
