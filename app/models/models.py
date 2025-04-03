@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from sqlalchemy import Column, String, Float, DateTime, PrimaryKeyConstraint, ForeignKey, Integer, BigInteger
 from sqlalchemy.dialects.mysql import VARCHAR
@@ -239,3 +240,75 @@ class DavisSensorDataStructure(Base):
     updated_at = Column(DateTime, default=func.now())
     product_name = Column(String)
     data_structure = Column(JSONB)
+
+class MeteoFranceData(Base):
+    __tablename__ = 'meteo_france_data'
+
+    geo_id_insee = Column(String, nullable=True)
+    reference_time = Column(DateTime, nullable=False)
+    insert_time = Column(DateTime, nullable=True)
+    validity_time = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+    lat = Column(Float, nullable=False)
+    lon = Column(Float, nullable=False)
+    t = Column(Float, nullable=True)
+    td = Column(Float, nullable=True)
+    u = Column(Integer, nullable=True)
+    dd = Column(Integer, nullable=True)
+    ff = Column(Float, nullable=True)
+    dxi10 = Column(Integer, nullable=True)
+    fxi10 = Column(Float, nullable=True)
+    rr_per = Column(Float, nullable=True)
+    t_10 = Column(Float, nullable=True)
+    t_20 = Column(Float, nullable=True)
+    t_50 = Column(Float, nullable=True)
+    t_100 = Column(Float, nullable=True)
+    vv = Column(Integer, nullable=True)
+    etat_sol = Column(String, nullable=True)
+    sss = Column(Integer, nullable=True)
+    insolh = Column(Integer, nullable=True)
+    ray_glo01 = Column(Integer, nullable=True)
+    pres = Column(Integer, nullable=True)
+    pmer = Column(Integer, nullable=True)
+
+    __table_args__ = (
+        PrimaryKeyConstraint('geo_id_insee', 'reference_time'),
+    )
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        """
+        Class method to create an instance from the dictionary (e.g., from an incoming message).
+        Ensures that datetime fields are converted to naive datetimes (without timezone).
+        """
+
+        def make_naive(dt):
+            return dt.replace(tzinfo=None) if isinstance(dt, datetime) and dt.tzinfo else dt
+
+        return cls(
+            lat=data["lat"],
+            lon=data["lon"],
+            geo_id_insee=data["geo_id_insee"],
+            reference_time=make_naive(data["reference_time"]),
+            insert_time=make_naive(data["insert_time"]),
+            validity_time=make_naive(data["validity_time"]),
+            t=data["t"],
+            td=data["td"],
+            u=data["u"],
+            dd=data["dd"],
+            ff=data["ff"],
+            dxi10=data.get("dxi10"),
+            fxi10=data.get("fxi10"),
+            rr_per=data["rr_per"],
+            t_10=data["t_10"],
+            t_20=data["t_20"],
+            t_50=data["t_50"],
+            t_100=data["t_100"],
+            vv=data["vv"],
+            etat_sol=data.get("etat_sol"),
+            sss=data["sss"],
+            insolh=data["insolh"],
+            ray_glo01=data["ray_glo01"],
+            pres=data["pres"],
+            pmer=data["pmer"]
+        )

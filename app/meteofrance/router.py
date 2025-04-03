@@ -1,22 +1,32 @@
 import traceback
+from typing import List
 
 import httpx
 from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.davis.router import api_token
+from app.db.session import get_db
 from app.logs.config_server_logs import server_logger
 from app.authentication import api_token
+import app.meteofrance.utils as utils
+import app.meteofrance.service as meteofrance_service
+from app.meteofrance.schemas import MeteoFranceInfrahoraireMessage
 
 router = APIRouter()
 
 @router.get("/receive_message/", dependencies=[Depends(api_token)])
-async def receive_message(station_id: str):
-    id_station = "20004002" # must be a string babushka
+async def receive_message(station_id: str, db: AsyncSession = Depends(get_db)):
+    """
+    Receive message from meteofrance
+    :param station_id:
+    :param db:
+    :return:
+    """
     async with httpx.AsyncClient() as client:
         external_api_uri = f"{settings.METEOFRANCE_URL}{settings.METEOFRANCE_OBS_INFRAHORAIRE}"
         params = {
-            "id_station": id_station,
+            "id_station": station_id,
             "format": settings.METEOFRANCE_OPTJSON,
         }
         headers = {"apikey": settings.METEOFRANCE_API_KEY}
@@ -32,6 +42,8 @@ async def receive_message(station_id: str):
             server_logger.error(error)
             raise HTTPException(status_code=response.status_code, detail=error)
 
-        response_data = response.json()
+        response_data: List[MeteoFranceInfrahoraireMessage] = utils.consume_meteofrance_message(response.json())
 
-        return response_data
+        await meteofrance_service.process_meteofrance_infrahoraire(db, response_data)
+
+        return [data.model_dump() for data in response_data]
